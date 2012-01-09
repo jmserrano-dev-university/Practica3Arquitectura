@@ -9,6 +9,7 @@
 #include <iostream>
 #include <vector>
 #include "imgs.h"
+#include <omp.h>
 
 using namespace std;
 
@@ -28,8 +29,12 @@ int main(int argc, char** argv) {
     int mitadTamano = 3/2;       // Mitad del tamaño del núcleo
     imgs gestorImagen;           // Gestor de la imagen, carga y almacena imagenes
     
+    
+    
 //    nombreImagen = "./imagenBN.pgm";
 
+    /*Capturamos el tiempo*/
+    double tiempoI = omp_get_wtime();
     
     /************** CARGAMOS IMAGEN *************/
     
@@ -44,7 +49,9 @@ int main(int argc, char** argv) {
     int fx,fy;
     imagenSalida = (unsigned char *) malloc ( w * h ); //Resevamos memoria para la imagen de salida (ancho por alto)
     
+    //#pragma omp parallel for
     for(int x = 0; x < w; x++){
+        //#pragma omp parallel for
         for(int y = 0; y < h ; y++){
             //Aplicamos convolución
             acomulador = 0;
@@ -74,6 +81,12 @@ int main(int argc, char** argv) {
    }
     
     cout << "IMAGEN OBTENIDA..." << endl;
+    
+    /*Capturamos el tiempo de nuevo*/
+    double tiempoF = omp_get_wtime();
+    
+    cout << tiempoI << " | " << tiempoF  << " tiempo: "  << tiempoF - tiempoI << endl << endl;
+    
     return 0;
 }
 
