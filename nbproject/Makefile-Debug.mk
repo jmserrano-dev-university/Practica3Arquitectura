@@ -52,7 +52,7 @@ FFLAGS=
 ASFLAGS=
 
 # Link Libraries and Options
-LDLIBSOPTIONS=-fopenmp
+LDLIBSOPTIONS=-fopenmp -fparallel
 
 # Build Targets
 .build-conf: ${BUILD_SUBPROJECTS}

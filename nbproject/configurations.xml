@@ -39,6 +39,7 @@
         <linkerTool>
           <linkerLibItems>
             <linkerOptionItem>-fopenmp</linkerOptionItem>
+            <linkerOptionItem>-fparallel</linkerOptionItem>
           </linkerLibItems>
         </linkerTool>
       </compileType>

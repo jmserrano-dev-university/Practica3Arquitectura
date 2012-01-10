@@ -48,6 +48,11 @@ int main(int argc, char** argv) {
     /************* DECLARACIÓN DE VARIABLES ***************/
     unsigned char *imagen; // Imagen original
     unsigned char *imagenSalida; // Imagen de salida
+    
+    unsigned char *imagenC; // Imagen original
+    unsigned char *imagenSalidaC; // Imagen de salida
+    
+    
     unsigned int h, w, M; // Alto, ancho e intersidad
     imgs gestorImagen; // Gestor de la imagen, carga y almacena imagenes
 
@@ -86,16 +91,16 @@ int main(int argc, char** argv) {
             exit(-1);
         }
     } else {
-        if (!gestorImagen.loadPpm(argv[1], &imagen, &w, &h, &M)) {
+        if (!gestorImagen.loadPpm(argv[1], &imagenC, &w, &h, &M)) {
             cout << "ERROR: Cargar imagen en COLOR" << endl;
             exit(-1);
         }
     }
 
     /************** REALIZAMOS CONVOLUCIÓN *************/
-    if (!color) { //Imagen en ESCALA DE GRIS
-        float acomulador, valorF;
-        int fx, fy;
+    float acomulador, valorF;
+    int fx, fy;
+    if (!color) { //Imagen en ESCALA DE GRIS    
         imagenSalida = (unsigned char *) malloc(w * h); //Resevamos memoria para la imagen de salida (ancho por alto)
 
         for (int x = 0; x < w; x++) {
@@ -120,8 +125,30 @@ int main(int argc, char** argv) {
             }
         }
     } else { //Imagen en COLOR
-        cout << "Queda implemetar la parte de color" << endl;
-        exit(0);
+        imagenSalidaC = (unsigned char *) malloc(w * h * 3); //Resevamos memoria para la imagen de salida (ancho por alto)
+        for (int z = 0; z < 3; z++) {
+            for (int x = 0; x < w; x++) {
+                for (int y = 0; y < h; y++) {
+                    //Aplicamos convolución
+                    acomulador = 0;
+                    for (int s = (mitadTamano * -1); s <= mitadTamano; s++) {
+                        for (int t = (mitadTamano * -1); t <= mitadTamano; t++) {
+                            fx = x + s;
+                            fy = y + t;
+
+                            if (fx < 0 || fy < 0 || fx >= w || fy >= h) {
+                                valorF = 0; //Si nos salimos de los límites ponemos 0
+                            } else {
+                                valorF = imagenC[w * fx + fy + z * w * h]; //Recorremos la matriz con un solo indice
+                            }
+                            acomulador += valorF * nucleo[(s + mitadTamano) * tamaNucleo + (t + mitadTamano)];
+                        }
+                    }
+                    //Guardamos el resultado en la imagen de salida
+                    imagenSalidaC[w * x + y + z * w * h] = (unsigned char) acomulador;
+                }
+            }
+        }
     }
 
     /************** GUARDAMOS IMAGEN *************/
@@ -131,7 +158,7 @@ int main(int argc, char** argv) {
             exit(-1);
         }
     } else {
-        if (!gestorImagen.savePgm(argv[2], imagenSalida, w, h, M)) {
+        if (!gestorImagen.savePgm(argv[2], imagenSalidaC, w, h, M)) {
             cout << "ERORR: Guardar imagen resultado en COLOR" << endl;
             exit(-1);
         }
